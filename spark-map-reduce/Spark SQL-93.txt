@@ -1,0 +1,47 @@
+## 3. Querying ##
+
+df2 = sqlCtx.sql("select age from census2010")
+df2.show()
+
+## 4. Filtering ##
+
+query = 'select males, females from census2010 where age >5 and age<15'
+sqlCtx.sql(query).show()
+
+## 6. Multiple tables ##
+
+from pyspark.sql import SQLContext
+sqlCtx = SQLContext(sc)
+df = sqlCtx.read.json("census_2010.json")
+df.registerTempTable('census2010')
+df = sqlCtx.read.json("census_1980.json")
+df.registerTempTable('census1980')
+df = sqlCtx.read.json("census_1990.json")
+df.registerTempTable('census1990')
+df = sqlCtx.read.json("census_2000.json")
+df.registerTempTable('census2000')
+tables = sqlCtx.tableNames()
+print(tables)
+
+## 7. Joins ##
+
+query = """
+ select census2010.total,census2000.total
+ from census2010 
+ inner join census2000 
+ on census2010.age=census2000.age
+"""
+sqlCtx.sql(query).show()
+
+## 8. SQL Functions ##
+
+query = """
+ select sum(a.total),sum(b.total),sum(c.total)
+ from census2010 as a
+ inner join census2000 as b
+ on a.age = b.age
+ inner join census1990 as c
+ on b.age = c.age
+"""
+sqlCtx.sql(query).show()
+ 
